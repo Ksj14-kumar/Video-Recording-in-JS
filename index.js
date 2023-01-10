@@ -1,14 +1,17 @@
 const btn = document.getElementById("btn")
+const Container= document.getElementById("container")
 const localVideo = document.getElementById("localVideo")
 const recordedVideo = document.getElementById("recordVideo")
 const recordStart = document.getElementById("recordbtn")
 const stopRecording = document.getElementById("stopRecording")
 const paused = document.getElementById("paused")
 const playVideo = document.getElementById("Play")
+const endedVideo = document.getElementById("mic")
+const shareScreen = document.getElementById("shareScreen")
 
 
 
-const DURATION= 5*1000
+const DURATION = 5 * 1000
 
 constraints = {
     video: {
@@ -21,18 +24,18 @@ constraints = {
 }
 
 
-function recordedStart(e){
-    storeBlob=[]
+function recordedStart(e) {
+    storeBlob = []
     try {
-        mediaRecorder= new MediaRecorder(localStream)
+        mediaRecorder = new MediaRecorder(localStream)
     } catch (er) {
         console.log(er)
     }
-    mediaRecorder.onstop= (e)=>{
-        console.log("store blobs",storeBlob)
+    mediaRecorder.onstop = (e) => {
+        console.log("store blobs", storeBlob)
     }
-    mediaRecorder.ondataavailable= function(e){
-        if(e.data && e.data.size>0){
+    mediaRecorder.ondataavailable = function (e) {
+        if (e.data && e.data.size > 0) {
             storeBlob.push(e.data)
         }
     }
@@ -41,11 +44,11 @@ function recordedStart(e){
 }
 
 
-function recordedStop(e){
+function recordedStop(e) {
     mediaRecorder.stop()
-    paused.disabled=true
-    recordStart.textContent= "Record Start"
-    playVideo.disabled= false
+    paused.disabled = true
+    recordStart.textContent = "Record Start"
+    playVideo.disabled = false
 }
 
 let localStream, mediaRecorder, storeBlob;
@@ -53,16 +56,17 @@ let localStream, mediaRecorder, storeBlob;
 
 // =========================Recording Stream start==================================
 recordStart.addEventListener("click", (e) => {
-    if (recordStart.textContent ==="Record Start") {
+    if (recordStart.textContent === "Record Start") {
         recordedStart(e)
-        recordStart.textContent="Stop Recording"
-        paused.disabled= false
+        recordStart.textContent = "Stop Recording"
+        paused.disabled = false
 
     }
-    else{
-        recordStart.textContent= "Record Start"
+    else {
+        recordStart.textContent = "Record Start"
         recordedStop(e)
-    }})
+    }
+})
 
 
 
@@ -122,14 +126,50 @@ paused.addEventListener("click", (e) => {
 
 
 // =========================PLAY RECORDED VIDEO==============
-playVideo.addEventListener("click",(e)=>{
+playVideo.addEventListener("click", (e) => {
     try {
-        const blob= new Blob(storeBlob,{type:"video/mp4"})
-        recordedVideo.src= window.URL.createObjectURL(blob)
+        const blob = new Blob(storeBlob, { type: "video/mp4" })
+        recordedVideo.src = window.URL.createObjectURL(blob)
         recordedVideo.play()
-        recordedVideo.style.display= "block"
+        recordedVideo.style.display = "block"
     } catch (err) {
         console.log(err)
-        
+
+    }
+})
+
+
+
+//==========================ENDED VIDEO=====================
+endedVideo.addEventListener("click", (e) => {
+    localStream.getVideoTracks()[0].onended = function (e) {
+        console.log(e)
+        alert("video is ended")
+    }
+})
+
+
+shareScreen.addEventListener("click", async (e) => {
+    try {
+        const constaints = {
+                width: { exact: 300 },
+                height:{exact:350}
+        }
+        const stream = await navigator.mediaDevices.getDisplayMedia(constaints)
+        localStream = stream
+        console.log(stream)
+        const video =document.createElement("video")
+        video.id= "share"
+        video.style.display=stream.active ?"block":document.removeChild("video")
+        video.srcObject= stream
+        video.width= "300"
+        video.height="400"
+        video.play()
+        Container.appendChild(video)
+        stream.getVideoTracks()[0].addEventListener("ended",(e)=>{
+            alert("screen share is ended")
+        })
+    } catch (err) {
+        console.log(err)
     }
 })
