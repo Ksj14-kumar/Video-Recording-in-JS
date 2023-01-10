@@ -139,7 +139,6 @@ playVideo.addEventListener("click", (e) => {
 })
 
 
-
 //==========================ENDED VIDEO=====================
 endedVideo.addEventListener("click", (e) => {
     localStream.getVideoTracks()[0].onended = function (e) {
@@ -147,11 +146,6 @@ endedVideo.addEventListener("click", (e) => {
         alert("video is ended")
     }
 })
-
-
-
-
-
 
 //========================Screen Share=================
 shareScreen.addEventListener("click", async (e) => {
