@@ -21,7 +21,6 @@ constraints = {
 }
 
 
-
 function recordedStart(e){
     storeBlob=[]
     try {
